@@ -14,7 +14,13 @@ try:
     
     # Aktivacija AI mozga - najstabilniji naziv modela
     genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
+    # Zamijeni liniju model = ... ovim:
+try:
+    # Forsiramo najnoviji stabilni model
+    model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
+except Exception:
+    # Rezervna opcija ako flash-latest ne reagira
+    model = genai.GenerativeModel(model_name='gemini-pro')
 except Exception as e:
     st.error("Sustav detektira grešku u Secrets panelu. Provjerite konfiguraciju na Streamlit Cloudu.")
     st.stop()
