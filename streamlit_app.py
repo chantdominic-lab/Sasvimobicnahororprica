@@ -18,7 +18,7 @@ st.markdown("""
 DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
 TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
 TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
-APP_LINK = st.secrets["autorske_tajne"]["app_link"]
+APP_LINK = st.secrets["autorske_tajne"]["https://share.streamlit.io/user/chantdominic-lab"]
 
 # --- ORIGINALNI TEKST (SVIH 10 PROZORA) ---
 prozori = [
