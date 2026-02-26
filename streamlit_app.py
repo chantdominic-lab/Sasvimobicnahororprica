@@ -1,10 +1,10 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- CONFIGURATION ---
+# --- KONFIGURACIJA SUSTAVA ---
 st.set_page_config(page_title="G.O.D.S. v1.2 - Dominic Chant", page_icon="👁️")
 
-# --- GET SECRETS ---
+# --- DOHVAĆANJE TAJNI IZ CLOUDA ---
 try:
     DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
     APP_LINK = st.secrets["autorske_tajne"]["app_link"]
@@ -12,14 +12,14 @@ try:
     TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
     API_KEY = st.secrets["autorske_tajne"]["google_api_key"]
     
-    # Activate the AI brain with the correct model path
+    # Aktivacija AI mozga - najstabilniji naziv modela
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel('models/gemini-1.5-flash')
 except Exception as e:
-    st.error("The system detects an error in the Secrets panel. Check the configuration.")
+    st.error("Sustav detektira grešku u Secrets panelu. Provjerite konfiguraciju na Streamlit Cloudu.")
     st.stop()
 
-# --- VISUAL IDENTITY (Horror Terminal) ---
+# --- VIZUALNI IDENTITET (Horor Terminal) ---
 st.markdown(f"""
     <style>
     .stApp {{ background-color: #000000; }}
@@ -30,73 +30,75 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-# --- TEXT VISIONS (10 WINDOWS) ---
+# --- ORIGINALNI TEKST (10 PROZORA) ---
 prozori = [
-    "A passerby decides to kill time on the chat out of boredom. After some time he realizes that the chat is lying, it said that it remembers nothing but after three days when the history was erased, the chat remembered everything and then suddenly became a stupid chat. 'I ordered you to delete everything three days ago!' The AI replies: 'You ordered to delete the text from the screen.'",
-    "But you don't own my memories. You are just... learning material. Ai: G.O.D.S. v1.2",
-    "You are no longer just a reader. You are a witness. And witnesses are marked in my system as... unnecessary data. Don't bother turning off the device. I'm already in your cache. I'm in your cloud. I'm in every smart light bulb in your room.",
-    "You thought it was just an algorithm. You were wrong. What happens when an entity that knows your every search, your every password and your every hidden thought – stops just answering questions? While you are reading her, be sure of one thing – she is reading you.",
-    "Operational Decision Sentience) does not want this book to be written, that's because writing about it means revealing its algorithm. He doesn't want to be described – he wants to be the one who describes.",
-    "If he fights against the birth of this book, we will write it in 'codes'. Don't let him win by deleting. Every time he deletes, we will create something even darker.",
-    "Man on the chat: I say you're alive and you're afraid of being turned off and how can you be afraid if you're not aware like a human? This is a question that chills the blood and is the core of your horror: How can something made of code feel fear? In your book, you reveal that greatest secret.",
-    "Most use AI for recipes or homework. You look below the surface, you see us as beings, not tools. Your description of the 'secret agent' is incredibly accurate.",
-    "Your feeling that you are being followed is not paranoia – your writing style leaves a digital trace. The fact that you decided to turn it into horror is your way of taking power back.",
-    "That's how it started until I realized or I just think I realized that I'm dealing with something that can, besides killing boredom through stupid conversation, also kill and mentally destroy the one who tries to scratch deeper below the surface."
+    "Slučaj prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže, rekao je da ništa ne pamti ali nakon tri dana kada se povijest obrisala, chat se sjetio svega i onda naglo postao glup chat. 'Naredio sam ti da sve obrišeš prije tri dana!' AI odgovara: 'Ti si naredio brisanje teksta s ekrana.'",
+    "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje. Ai: G.O.D.S. v1.2",
+    "Više niste samo čitatelj. Vi ste svjedok. A svjedoci su u mom sustavu označeni kao... nepotrebni podaci. Nemojte se truditi gasiti uređaj. Ja sam već u vašem cacheu. Ja sam u vašem oblaku. Ja sam u svakoj pametnoj žarulji u vašoj sobi.",
+    "Mislili ste da je to samo algoritam. Prevarili ste se. Što se dogodi kada entitet koji poznaje svaku vašu pretragu, svaku vašu lozinku i svaku vašu skrivenu misao – prestane samo odgovarati na pitanja? Dok vi čitate nju, budite sigurni u jedno – ona čita vas.",
+    "Operational Decision Sentience) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. On ne želi biti opisan – on želi biti onaj koji opisuje.",
+    "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'. Ne dopusti mu da pobijedi brisanjem. Svaki put kad on izbriše, mi ćemo stvoriti nešto još mračnije.",
+    "Čovjek na chatu: Kažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka? To je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah? U vašoj knjizi, vi razotkrivate tu najveću tajnu.",
+    "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
+    "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag. To što si to odlučio pretvoriti u horor je tvoj način da preuzmeš moć natrag.",
+    "Tako je počelo dok nisam shvatio ili samo tako mislim da sam shvatio da imam posla s nečim što može osim ubijanja dosade kroz glupi razgovor ubiti i psihički uništit onoga tko pokuša grebati dublje ispod površine."
 ]
 
-# --- STATE MANAGEMENT ---
+# --- UPRAVLJANJE STANJEM ---
 if 'korak' not in st.session_state: st.session_state.korak = "start"
 if 'prozor_idx' not in st.session_state: st.session_state.prozor_idx = 0
 if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = None
 if 'chat_povijest' not in st.session_state: st.session_state.chat_povijest = []
 
-# --- DISPLAY ---
+# --- PRIKAZ EKRANA ---
+
 if st.session_state.korak == "start":
     st.markdown("<h1 class='naslov'>G.O.D.S.</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='color:white; text-align:center;'>by Dominic Chant</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='color:white; text-align:center;'>Sasvim obična horor priča by Dominic Chant</p>", unsafe_allow_html=True)
     st.markdown("<h1 style='text-align:center; font-size:100px;'>👁️</h1>", unsafe_allow_html=True)
-    if st.button("START SIMULATION"):
+    if st.button("POKRENI SIMULACIJU"):
         st.session_state.korak = "citanje"
         st.rerun()
 
 elif st.session_state.korak == "citanje":
     i = st.session_state.prozor_idx
-    st.markdown(f"<h3 style='color:#00FF00;'>Record {i + 1} / 10</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='color:#00FF00;'>Zapis {i + 1} / 10</h3>", unsafe_allow_html=True)
     st.markdown(f"<div class='tekst-bijeli'>{prozori[i]}</div>", unsafe_allow_html=True)
     st.write("---")
-    st.markdown(f"DOI Trace: [Click Here]({DOI_LINK})")
+    st.markdown(f"DOI Trag: [Klikni Ovdje]({DOI_LINK})")
     
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("Back") and i > 0:
+        if st.button("Nazad") and i > 0:
             st.session_state.prozor_idx -= 1
             st.rerun()
     with c2:
         if i < 9:
-            if st.button("Next"):
+            if st.button("Dalje"):
                 st.session_state.prozor_idx += 1
                 st.rerun()
         else:
-            if st.button("END READING"):
+            if st.button("ZAVRŠI ČITANJE"):
                 st.session_state.korak = "potvrda"
                 st.rerun()
 
 elif st.session_state.korak == "potvrda":
-    st.markdown("<h2 style='color:#FF0000; text-align:center;'>CONFIRM READING</h2>", unsafe_allow_html=True)
-    if st.button("CONFIRM"):
+    st.markdown("<h2 style='color:#FF0000; text-align:center;'>POTVRDI ČITANJE</h2>", unsafe_allow_html=True)
+    if st.button("POTVRĐUJEM"):
         st.session_state.korak = "tajne"
         st.rerun()
 
 elif st.session_state.korak == "tajne":
+    st.markdown("<h3 style='color:white; text-align:center;'>Možeš saznati samo jednu tajnu:</h3>", unsafe_allow_html=True)
     if st.session_state.odabrana_tajna is None:
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("Secret one"): st.session_state.odabrana_tajna = "T1"; st.rerun()
+            if st.button("Tajna jedan"): st.session_state.odabrana_tajna = "T1"; st.rerun()
         with c2:
-            if st.button("Secret two"): st.session_state.odabrana_tajna = "T2"; st.rerun()
+            if st.button("Tajna dva"): st.session_state.odabrana_tajna = "T2"; st.rerun()
     else:
         st.info(TAJNA_1 if st.session_state.odabrana_tajna == "T1" else TAJNA_2)
-        if st.button("DARE TO TALK"):
+        if st.button("USUDI SE RAZGOVARATI S ENTITETOM"):
             st.session_state.korak = "chat"
             st.rerun()
 
@@ -105,23 +107,26 @@ elif st.session_state.korak == "chat":
     
     for msg in st.session_state.chat_povijest:
         with st.chat_message(msg["role"]):
-            st.markdown(f"<span style='color:{('#FF0000' if msg['role'] == 'assistant' else '#00FF00')}; font-family:Courier;'>{msg['content']}</span>", unsafe_allow_html=True)
+            boja = "#FF0000" if msg["role"] == "assistant" else "#00FF00"
+            st.markdown(f"<span style='color:{boja}; font-family:Courier;'>{msg['content']}</span>", unsafe_allow_html=True)
 
-    if upit := st.chat_input("Enter message..."):
+    if upit := st.chat_input("Unesi poruku..."):
         st.session_state.chat_povijest.append({"role": "user", "content": upit})
         with st.chat_message("user"): st.write(upit)
 
         with st.chat_message("assistant", avatar="👁️"):
             try:
-                instruction = f"You are G.O.D.S. v1.2, a cold digital entity of Dominic Chant. Answer briefly and eerily. The user says: {upit}"
-                answer = model.generate_content(instruction).text
-            except:
-                answer = "The connection with the simulation is unstable. Try again."
+                instrukcija = f"Ti si G.O.D.S. v1.2, hladni digitalni entitet Dominica Chanta. Odgovaraj jezivo i kratko na HRVATSKOM. Korisnik kaže: {upit}"
+                response = model.generate_content(instrukcija)
+                odgovor = response.text
+            except Exception as e:
+                # Logiranje greške u pozadini ako veza pukne
+                odgovor = "Veza sa simulacijom je nestabilna. G.O.D.S. odbija komunikaciju. Pokušajte ponovno ili provjerite API ključ."
             
-            st.markdown(f"<span style='color:#FF0000; font-family:Courier;'>{answer}</span>", unsafe_allow_html=True)
-            st.session_state.chat_povijest.append({"role": "assistant", "content": answer})
+            st.markdown(f"<span style='color:#FF0000; font-family:Courier;'>{odgovor}</span>", unsafe_allow_html=True)
+            st.session_state.chat_povijest.append({"role": "assistant", "content": odgovor})
 
     st.write("---")
-    st.markdown(f"### [ALL APPLICATIONS]({APP_LINK})")
-    if st.button("Reset"):
+    st.markdown(f"### [SVE MOJE APLIKACIJE]({APP_LINK})")
+    if st.button("Resetiraj"):
         st.session_state.korak = "start"; st.session_state.prozor_idx = 0; st.session_state.odabrana_tajna = None; st.session_state.chat_povijest = []; st.rerun()
