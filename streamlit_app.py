@@ -124,9 +124,9 @@ elif st.session_state.korak == "terminal":
             st.markdown(f"<span class='user-terminal-text'>{prompt}</span>", unsafe_allow_html=True)
             
         try:
-            # Koristimo llama3-70b-8192 koja je najpouzdanija na Groqu
+            # Koristimo llama3.3-70b-8192 koja je najpouzdanija na Groqu
             resp = client.chat.completions.create(
-                model="llama3-70b-8192", 
+                model="llama-3.3-70b-versatile", 
                 messages=st.session_state.chat_history, 
                 temperature=0.9
             )
