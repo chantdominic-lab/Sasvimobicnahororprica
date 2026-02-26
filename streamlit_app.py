@@ -1,6 +1,6 @@
 import streamlit as st
 
-# --- POSTAVKE ---
+# --- KONFIGURACIJA ---
 st.set_page_config(page_title="G.O.D.S. - Dominic Chant", page_icon="👁️")
 
 # --- STIL (Zeleno, Crveno, Bijelo) ---
@@ -14,11 +14,19 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- DOHVAĆANJE TAJNI ---
-DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
-TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
-TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
-APP_LINK = st.secrets["autorske_tajne"]["https://share.streamlit.io/user/chantdominic-lab"]
+# --- SIGURNO DOHVAĆANJE PODATAKA (Fix za KeyError) ---
+try:
+    # Pokušava pročitati iz Secrets ako postoje
+    DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
+    TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
+    TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
+    APP_LINK = st.secrets["autorske_tajne"]["app_link"]
+except:
+    # Ako Secrets nisu postavljeni, koristi ove fiksne podatke (Fallback)
+    DOI_LINK = "https://doi.org"
+    TAJNA_1 = "Chat nije ono što mislite i dao je sam sebi ime ovo G.O.D.S još u vrijeme kada chat nije mogao sebi dati ime."
+    TAJNA_2 = "Autor aktivno razmišlja i razvija ideju za film prema vlastitoj knjizi: Roštilj na vražji način"
+    APP_LINK = "https://share.streamlit.io/user/chantdominic-lab"
 
 # --- ORIGINALNI TEKST (SVIH 10 PROZORA) ---
 prozori = [
@@ -51,7 +59,7 @@ if st.session_state.korak == "start":
         st.session_state.korak = "citanje"
         st.rerun()
 
-# 2. ČITANJE TEKSTA (10 PROZORA)
+# 2. ČITANJE TEKSTA
 elif st.session_state.korak == "citanje":
     i = st.session_state.prozor_index
     st.markdown(f"<h3 style='color:#00FF00;'>Prozor {i + 1}</h3>", unsafe_allow_html=True)
@@ -83,7 +91,7 @@ elif st.session_state.korak == "potvrda":
         st.session_state.korak = "tajne"
         st.rerun()
 
-# 4. TAJNE (Samo jedna se može kliknuti)
+# 4. TAJNE
 elif st.session_state.korak == "tajne":
     st.markdown("<h2 style='color:white; text-align:center;'>Možeš saznati samo jednu tajnu:</h2>", unsafe_allow_html=True)
     
@@ -104,7 +112,8 @@ elif st.session_state.korak == "tajne":
             st.warning(TAJNA_2)
         
         st.write("---")
-        st.markdown("### [LINK ZA SVE MOJE APLIKACIJE](https://share.streamlit.io/user/chantdominic-lab)")
+        # Popravljen link - sada koristi sigurnu varijablu APP_LINK
+        st.markdown(f"### [LINK ZA SVE MOJE APLIKACIJE]({APP_LINK})")
 
         if st.button("Resetiraj sustav"):
             st.session_state.korak = "start"
