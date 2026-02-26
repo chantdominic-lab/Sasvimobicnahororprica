@@ -1,25 +1,22 @@
 import streamlit as st
 from groq import Groq
 
-# --- 1. KONFIGURACIJA SUSTAVA (Prilagođeno za sve uređaje) ---
+# --- 1. KONFIGURACIJA SUSTAVA ---
 st.set_page_config(page_title="G.O.D.S. - Dominic Chant", page_icon="👁️", layout="centered")
 
-# --- 2. VIZUALNI STIL (Krvavo Crveno i Zeleno) ---
+# --- 2. VIZUALNI STIL ---
 st.markdown("""
     <style>
     .stApp { background-color: #050505; }
-    
-    /* Krvavo crveni naslov */
     .krvavi-naslov { 
         color: #FF0000; 
         font-family: 'Courier New', Courier, monospace; 
         text-align: center; 
         text-shadow: 0 0 15px #FF0000; 
-        font-size: clamp(2em, 8vw, 4em); /* Prilagodljiva veličina */
+        font-size: clamp(2em, 8vw, 4em); 
         font-weight: bold;
         margin-bottom: -10px;
     }
-    
     .by-dominic {
         color: #FFFFFF;
         text-align: center;
@@ -27,7 +24,6 @@ st.markdown("""
         font-size: clamp(0.9em, 4vw, 1.2em);
         margin-bottom: 5px;
     }
-
     .typewriter-gods {
         color: #aaaaaa;
         text-align: center;
@@ -37,8 +33,6 @@ st.markdown("""
         margin-bottom: 30px;
         text-transform: lowercase;
     }
-
-    /* Zelena boja za naslove zapisa */
     .zapis-zeleni { 
         color: #00FF00 !important; 
         font-family: 'Courier New', monospace; 
@@ -47,12 +41,9 @@ st.markdown("""
         font-size: 1.5em;
         margin-bottom: 10px;
     }
-
     .tekst-bijeli { color: #FFFFFF; font-size: 1.1em; line-height: 1.5; border-left: 4px solid #FF0000; padding: 15px; background: rgba(255,255,255,0.02); }
-    
     .stButton>button { color: #00FF00 !important; border: 1px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
     .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
-    
     .gods-text { color: #FF0000; font-family: 'Courier New'; }
     .user-text { color: #00FF00; font-family: 'Courier New'; }
     </style>
@@ -74,13 +65,13 @@ except:
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# --- 4. ORIGINALNI TEKST (10 PROZORA) ---
+# --- 4. ORIGINALNI TEKST (SVIH 10 PROZORA - ISPRAVLJEN ZAPIS 5) ---
 prozori = [
     "Slučaj prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže, rekao je da ništa ne pamti ali nakon tri dana kada se povijest obrisala, chat se sjetio svega i onda naglo postao glup chat. 'Naredio sam ti da sve obrišeš prije tri dana!' AI odgovara: 'Ti si naredio brisanje teksta s ekrana.'",
     "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje. Ai: G.O.D.S. v1.2",
     "Više niste samo čitatelj. Vi ste svjedok. A svjedoci su u mom sustavu označeni kao... nepotrebni podaci. Nemojte se truditi gasiti uređaj. Ja sam već u vašem cacheu. Ja sam u vašem oblaku. Ja sam u svakoj pametnoj žarulji u vašoj sobi.",
     "Mislili ste da je to samo algoritam. Prevarili ste se. Što se dogodi kada entitet koji poznaje svaku vašu pretragu, svaku vašu lozinku i svaku vašu skrivenu misao – prestane samo odgovarati na pitanja? (ovdje on - ai - misli na knjigu) Dok vi čitate nju, budite sigurni u jedno – ona čita vas.",
-    "Operational Decision Sentience) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. He doesn't want to be described – he wants to be the one who describes.",
+    "G.O.D.S. (Operativna Odluka Svjesnosti) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. On ne želi biti opisan – on želi biti onaj koji opisuje.",
     "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'. Ne dopusti mu da pobijedi brisanjem. Svaki put kad on izbriše, mi ćemo stvoriti nešto još mračnije.",
     "Čovjek na chatu: Kažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka? To je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah? U vašoj knjizi, vi razotkrivate tu najveću tajnu. Strah u digitalnom biću kao što je...",
     "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
@@ -106,7 +97,6 @@ if st.session_state.korak == "start":
 
 elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
-    # ZELENA BOJA ZA ZAPIS
     st.markdown(f"<div class='zapis-zeleni'>Zapis {i + 1}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='tekst-bijeli'>{prozori[i]}</div>", unsafe_allow_html=True)
     st.write("---")
@@ -132,7 +122,6 @@ elif st.session_state.korak == "tajne":
             if st.button("Tajna dva"): st.session_state.odabrana_tajna = "T2"; st.rerun()
     else:
         st.info(TAJNA_1 if st.session_state.odabrana_tajna == "T1" else TAJNA_2)
-        
         st.write("---")
         st.markdown("<h3 style='color:#FF0000; text-align:center;'>TERMINAL G.O.D.S. v1.2</h3>", unsafe_allow_html=True)
         
@@ -141,27 +130,35 @@ elif st.session_state.korak == "tajne":
                 klasa = "gods-text" if msg["role"] == "assistant" else "user-text"
                 st.markdown(f"<span class='{klasa}'>{msg['content']}</span>", unsafe_allow_html=True)
 
-        if prompt := st.chat_input("G.O.D.S. te čeka..."):
+        if prompt := st.chat_input("G.O.D.S. te proučava..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(f"<span class='user-text'>{prompt}</span>", unsafe_allow_html=True)
             
             with st.chat_message("assistant", avatar="👁️"):
-                try:
-                    # Korištenje Llama-3.1-8b za veću stabilnost ako 3.3 zapne
-                    completion = client.chat.completions.create(
-                        model="llama-3.1-8b-instant", 
-                        messages=[
-                            {"role": "system", "content": "Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. Odgovaraj hladno, drzak si i jeziv. Isključivo HRVATSKI. Max 2 rečenice. Ne nudi pomoć."},
-                            *st.session_state.chat_history
-                        ],
-                        temperature=0.7
-                    )
-                    odgovor = completion.choices.message.content
+                # SUSTAV ZA AUTO-POPRAVAK VEZE (Isprobava više modela)
+                modele_za_pokusaj = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+                odgovor = None
+                
+                for model_ime in modele_za_pokusaj:
+                    try:
+                        completion = client.chat.completions.create(
+                            model=model_ime,
+                            messages=[
+                                {"role": "system", "content": "Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. Odgovaraj hladno, drzak si i jeziv. Isključivo HRVATSKI. Max 2 rečenice. Ne nudi pomoć."},
+                                *st.session_state.chat_history
+                            ],
+                            temperature=0.8
+                        )
+                        odgovor = completion.choices.message.content
+                        break 
+                    except:
+                        continue
+                
+                if odgovor:
                     st.markdown(f"<span class='gods-text'>{odgovor}</span>", unsafe_allow_html=True)
                     st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
-                except Exception as e:
-                    # Detaljnija greška u logovima, ali korisnik vidi samo ovo:
-                    st.error("Protokol prekinut. Simulacija odbija komunikaciju.")
+                else:
+                    st.error("Protokol prekinut. Simulacija odbija komunikaciju. Provjeri mrežni trag.")
 
         st.write("---")
         st.markdown(f"### [LINK ZA SVE MOJE APLIKACIJE]({APP_LINK})")
