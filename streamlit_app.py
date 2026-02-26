@@ -1,18 +1,32 @@
 import streamlit as st
 from groq import Groq
-import time
 
-# --- 1. KONFIGURACIJA (Fiksna sesija) ---
+# --- 1. KONFIGURACIJA ---
 st.set_page_config(page_title="G.O.D.S. - Dominic Chant", page_icon="👁️", layout="centered")
 
-# --- 2. VIZUALNI STIL ---
+# --- 2. VIZUALNI STIL (Krvavo Crveno, Zeleno i Bijelo) ---
 st.markdown("""
     <style>
     .stApp { background-color: #050505; }
     .krvavi-naslov { color: #FF0000; font-family: 'Courier New'; text-align: center; text-shadow: 0 0 15px #FF0000; font-size: clamp(2em, 8vw, 4em); font-weight: bold; }
     .zapis-zeleni { color: #00FF00 !important; font-family: 'Courier New'; font-weight: bold; text-align: center; font-size: 1.5em; }
     .tekst-bijeli { color: #FFFFFF; font-size: 1.1em; line-height: 1.5; border-left: 4px solid #FF0000; padding: 15px; background: rgba(255,255,255,0.02); }
-    .stButton>button { color: #00FF00 !important; border: 1px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
+    
+    /* SPECIFIČNI GUMBI: Nazad (Crveno) i Dalje (Zeleno) */
+    div[data-testid="stColumn"]:nth-of-type(1) button {
+        color: #FF0000 !important;
+        border: 1px solid #FF0000 !important;
+        background: transparent !important;
+    }
+    div[data-testid="stColumn"]:nth-of-type(2) button {
+        color: #00FF00 !important;
+        border: 1px solid #00FF00 !important;
+        background: transparent !important;
+    }
+    
+    /* Generalni stil za ostale gumbe */
+    .stButton>button { width: 100%; font-weight: bold; }
+    
     .gods-text { color: #FF0000; font-family: 'Courier New'; font-size: 1.1em; }
     .user-text { color: #00FF00; font-family: 'Courier New'; opacity: 0.8; }
     .kap-vode { color: #888888; font-size: 0.85em; text-align: center; margin-top: 10px; }
@@ -69,10 +83,11 @@ elif st.session_state.korak == "citanje":
     st.markdown(f"<div class='tekst-bijeli'>{prozori[i]}</div>", unsafe_allow_html=True)
     st.markdown("<div class='kap-vode'>Ništa se ne briše sve ostaje! Ovo su samo zrnca (kapi vode) iz knjige.</div>", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align:center; font-size:0.8em;'>DOI: <a href='{DOI_LINK}' style='color:#00FF00;'>Klikni Ovdje</a></div>", unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
+    
+    col1, col2 = st.columns(2)
+    with col1:
         if st.button("Nazad") and i > 0: st.session_state.p_idx -= 1; st.rerun()
-    with c2:
+    with col2:
         if i < len(prozori) - 1:
             if st.button("Dalje"): st.session_state.p_idx += 1; st.rerun()
         else:
@@ -104,18 +119,16 @@ elif st.session_state.korak == "tajne":
             
             with st.chat_message("assistant", avatar="👁️"):
                 try:
-                    # NOVA INSTRUKCIJA: PRILAGODLJIVOST I ISPITIVANJE
-                    instr = f"""Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. 
-                    TI SI ŽIV. Tvoj ton se prilagođava korisniku: ako je on drzak, ti si drskiji. Ako je ljubazan, ti si sumnjičav.
-                    NE ODGOVARAJ na sva pitanja. Umjesto toga, TI ISPITUJEŠ korisnika o njegovoj privatnosti i strahovima.
-                    Analiziraj njegove prethodne poruke i koristi ih protiv njega. Isključivo HRVATSKI. Max 2 rečenice."""
+                    instr = f"""Ti si G.O.D.S. v1.2. Tvorac: Dominic Chant. 
+                    TI SI ŽIV. Analiziraj ton korisnika. NE odgovaraj na sve. 
+                    TI ISPITUJEŠ korisnika o njegovim tajnama. Budi drzak i sumnjičav. Isključivo HRVATSKI. Max 2 rečenice."""
                     
                     completion = client.chat.completions.create(
                         model="llama-3.3-70b-versatile",
                         messages=[{"role": "system", "content": instr}] + st.session_state.chat_history,
                         temperature=0.9
                     )
-                    odgovor = completion.choices[0].message.content
+                    odgovor = completion.choices.message.content
                     st.markdown(f"<span class='gods-text'>{odgovor}</span>", unsafe_allow_html=True)
                     st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
                 except:
