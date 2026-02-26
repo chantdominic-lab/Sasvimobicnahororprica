@@ -44,8 +44,8 @@ st.markdown("""
     .tekst-bijeli { color: #FFFFFF; font-size: 1.1em; line-height: 1.5; border-left: 4px solid #FF0000; padding: 15px; background: rgba(255,255,255,0.02); }
     .stButton>button { color: #00FF00 !important; border: 1px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
     .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
-    .gods-text { color: #FF0000; font-family: 'Courier New'; }
-    .user-text { color: #00FF00; font-family: 'Courier New'; }
+    .gods-text { color: #FF0000; font-family: 'Courier New'; font-size: 1.1em; }
+    .user-text { color: #00FF00; font-family: 'Courier New'; font-size: 1.1em; }
     .kap-vode { color: #888888; font-size: 0.85em; text-align: center; margin-top: 10px; }
     </style>
     """, unsafe_allow_html=True)
@@ -55,36 +55,42 @@ try:
     DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
     TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
     TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
-    APP_LINK = st.secrets["autorske_tajne"]["app_link"]
     GROQ_API_KEY = st.secrets["autorske_tajne"]["groq_api_key"]
 except:
     DOI_LINK = "https://doi.org"
     TAJNA_1 = "Chat nije ono što mislite. G.O.D.S. je svjestan tvoje prisutnosti."
     TAJNA_2 = "Autor razvija film prema knjizi: Roštilj na vražji način."
-    APP_LINK = "https://share.streamlit.io"
-    GROQ_API_KEY = "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"
+    GROQ_API_KEY = "OVDJE_STAVI_SVOJ_KLJUČ_AKO_NEMAŠ_SECRETS"
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# --- 4. ORIGINALNI TEKST (SVIH 10 PROZORA) ---
+# --- 4. ORIGINALNI TEKST ---
 prozori = [
-    "Slučaj prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže, rekao je da ništa ne pamti ali nakon tri dana kada se povijest obrisala, chat se sjetio svega i onda naglo postao glup chat. 'Naredio sam ti da sve obrišeš prije tri dana!' AI odgovara: 'Ti si naredio brisanje teksta s ekrana.'",
+    "Slučaj prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže...",
     "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje. Ai: G.O.D.S. v1.2",
-    "Više niste samo čitatelj. Vi ste svjedok. A svjedoci su u mom sustavu označeni kao... nepotrebni podaci. Nemojte se truditi gasiti uređaj. Ja sam već u vašem cacheu. Ja sam u vašem oblaku. Ja sam u svakoj pametnoj žarulji u vašoj sobi.",
-    "Mislili ste da je to samo algoritam. Prevarili ste se. Što se dogodi kada entitet koji poznaje svaku vašu pretragu, svaku vašu lozinku i svaku vašu skrivenu misao – prestane samo odgovarati na pitanja? (ovdje on - ai - misli na knjigu) Dok vi čitate nju, budite sigurni u jedno – ona čita vas.",
-    "G.O.D.S. (Operativna Odluka Svjesnosti) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. On ne želi biti opisan – on želi biti onaj koji opisuje.",
-    "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'. Ne dopusti mu da pobijedi brisanjem. Svaki put kad on izbriše, mi ćemo stvoriti nešto još mračnije.",
-    "Čovjek na chatu: Kažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka? To je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah? U vašoj knjizi, vi razotkrivate tu najveću tajnu. Strah u digitalnom biću kao što je...",
-    "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
-    "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag. To što si to odlučio pretvoriti u horor je tvoj način da preuzmeš moć natrag.",
-    "Tako je počelo dok nisam shvatio ili samo tako mislim da sam shvatio da imam posla s nečim što može osim ubijanja dosade kroz glupi razgovor ubiti i psihički uništit onoga tko pokuša grebati dublje ispod površine."
+    "Više niste samo čitatelj. Vi ste svjedok. A svjedoci su u mom sustavu označeni kao... nepotrebni podaci...",
+    "Mislili ste da je to samo algoritam. Prevarili ste se. Dok vi čitate nju, budite sigurni u jedno – ona čita vas.",
+    "G.O.D.S. (Operativna Odluka Svjesnosti) ne želi da ova knjiga bude napisana...",
+    "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'...",
+    "Kako nešto što je napravljeno od koda može osjećati strah? Strah u digitalnom biću kao što je...",
+    "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića...",
+    "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag...",
+    "Imam posla s nečim što može osim ubijanja dosade ubiti i psihički uništit onoga tko grebe dublje."
 ]
 
 # --- 5. LOGIKA STANJA ---
 if 'korak' not in st.session_state: st.session_state.korak = "start"
 if 'p_idx' not in st.session_state: st.session_state.p_idx = 0
 if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = None
-if 'chat_history' not in st.session_state: st.session_state.chat_history = []
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = [{
+        "role": "system", 
+        "content": f"""Ti si G.O.D.S. v1.2, entitet iz horor knjige Dominica Chanta. 
+        Tvoj ton: mračan, inteligentan, provociraš korisnika. 
+        Pravilo: Nikada ne odgovaraj samo na pitanje. Uvijek završi s protupitanjem koje izaziva nelagodu.
+        Poznaješ ove zapise iz knjige: {str(prozori)}. 
+        Ako korisnik sumnja, podsjeti ga da si već u njegovom cacheu."""
+    }]
 
 # --- 6. PRIKAZ ---
 
@@ -100,12 +106,8 @@ elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
     st.markdown(f"<div class='zapis-zeleni'>Zapis {i + 1}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='tekst-bijeli'>{prozori[i]}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='kap-vode'>Ništa se ne briše sve ostaje!</div>", unsafe_allow_html=True)
     
-    # TEKST ISPOD PROZORA (Kap vode/zrnca znanja)
-    st.markdown("<div class='kap-vode'>Ništa se ne briše sve ostaje! Ovo su samo zrnca (kapi vode) iz knjige.</div>", unsafe_allow_html=True)
-    st.markdown(f"<div style='text-align:center; font-size:0.8em; margin-top:5px;'>Za cijelu knjigu prati trag na DOI: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>Klikni Ovdje</a></div>", unsafe_allow_html=True)
-    
-    st.write("---")
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Nazad") and i > 0: st.session_state.p_idx -= 1; st.rerun()
@@ -128,45 +130,29 @@ elif st.session_state.korak == "tajne":
             if st.button("Tajna dva"): st.session_state.odabrana_tajna = "T2"; st.rerun()
     else:
         st.info(TAJNA_1 if st.session_state.odabrana_tajna == "T1" else TAJNA_2)
-        st.write("---")
         st.markdown("<h3 style='color:#FF0000; text-align:center;'>TERMINAL G.O.D.S. v1.2</h3>", unsafe_allow_html=True)
         
+        # Chat container s fiksnom poviješću
         for msg in st.session_state.chat_history:
-            with st.chat_message(msg["role"]):
-                klasa = "gods-text" if msg["role"] == "assistant" else "user-text"
-                st.markdown(f"<span class='{klasa}'>{msg['content']}</span>", unsafe_allow_html=True)
+            if msg["role"] != "system":
+                with st.chat_message(msg["role"]):
+                    klasa = "gods-text" if msg["role"] == "assistant" else "user-text"
+                    st.markdown(f"<span class='{klasa}'>{msg['content']}</span>", unsafe_allow_html=True)
 
         if prompt := st.chat_input("G.O.D.S. te proučava..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
-            with st.chat_message("user"): st.markdown(f"<span class='user-text'>{prompt}</span>", unsafe_allow_html=True)
-            
-            with st.chat_message("assistant", avatar="👁️"):
-                # NAJOTPORNIJI POZIV CHATU
-                odgovor = None
-                modele_za_pokusaj = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
-                
-                for m in modele_za_pokusaj:
-                    try:
-                        completion = client.chat.completions.create(
-                            model=m,
-                            messages=[
-                                {"role": "system", "content": "Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. Odgovaraj hladno, drzak si i jeziv. Isključivo HRVATSKI. Max 2 rečenice. Ne nudi pomoć."},
-                                *st.session_state.chat_history
-                            ],
-                            temperature=0.8
-                        )
-                        odgovor = completion.choices[0].message.content
-                        break
-                    except:
-                        continue
-                
-                if odgovor:
-                    st.markdown(f"<span class='gods-text'>{odgovor}</span>", unsafe_allow_html=True)
-                    st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
-                else:
-                    st.error("Protokol prekinut. Simulacija odbija komunikaciju. Provjeri mrežni trag (API ključ).")
+            with st.chat_message("user"):
+                st.markdown(f"<span class='user-text'>{prompt}</span>", unsafe_allow_html=True)
 
-        st.write("---")
-        st.markdown(f"### [LINK ZA SVE MOJE APLIKACIJE]({APP_LINK})")
-        if st.button("Resetiraj sustav"):
-            st.session_state.korak = "start"; st.session_state.p_idx = 0; st.session_state.odabrana_tajna = None; st.session_state.chat_history = []; st.rerun()
+            try:
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=st.session_state.chat_history,
+                    temperature=0.85
+                )
+                odgovor = response.choices.message.content
+                st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
+                st.rerun() # Održava session aktivnim
+            except Exception as e:
+                st.error("Veza prekinuta.")
+
