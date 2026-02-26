@@ -1,10 +1,10 @@
 import streamlit as st
 from groq import Groq
 
-# --- 1. KONFIGURACIJA ---
+# --- 1. KONFIGURACIJA SUSTAVA ---
 st.set_page_config(page_title="G.O.D.S. v1.2 - Dominic Chant", page_icon="👁️", layout="centered")
 
-# --- 2. DOHVAĆANJE TAJNI ---
+# --- 2. DOHVAĆANJE TAJNI (Sustav Sigurnosti) ---
 try:
     DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
     APP_LINK = st.secrets["autorske_tajne"]["app_link"]
@@ -15,36 +15,57 @@ try:
     # Inicijalizacija Groq klijenta
     client = Groq(api_key=API_KEY)
 except Exception as e:
-    st.error(f"Sustav detektira prekid u bazi podataka. Provjeri Secrets.")
+    st.error("Sustav detektira prekid u bazi podataka. Provjerite Secrets panel.")
     st.stop()
 
-# --- 3. STIL (Fiksni Terminal - Bez 'hodanja' teksta) ---
+# --- 3. VIZUALNI IDENTITET (Fiksni Fontovi i Boje) ---
 st.markdown("""
     <style>
+    @import url('https://fonts.googleapis.com');
+    
     .stApp { background-color: #000000; color: #FFFFFF; }
-    .naslov { color: #00FF00; text-align: center; font-family: 'Courier New', monospace; text-shadow: 0 0 10px #FF0000; font-size: 3.5em; margin-bottom: 0px; }
+    
+    .naslov { 
+        color: #00FF00; 
+        text-align: center; 
+        font-family: 'Courier Prime', monospace; 
+        text-shadow: 0 0 10px #FF0000; 
+        font-size: 3.5em; 
+        margin-bottom: 10px; 
+    }
+    
     .tekst-bijeli { 
         color: #FFFFFF; 
-        font-size: 1.25em; 
+        font-size: 1.2em; 
         line-height: 1.6; 
         border-left: 4px solid #FF0000; 
         padding: 20px; 
         background-color: #0A0A0A;
         font-family: 'Georgia', serif;
-        min-height: 200px;
+        min-height: 220px;
     }
+    
     .stButton>button { 
         color: #00FF00 !important; 
         border: 1px solid #00FF00 !important; 
         background: transparent !important; 
         width: 100%; 
         height: 60px;
-        font-family: 'Courier New', monospace;
+        font-family: 'Courier Prime', monospace;
         font-weight: bold;
+        font-size: 1.1em;
     }
-    .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
-    /* Chat baloni */
-    .stChatMessage { background-color: #080808 !important; border: 1px solid #1a0000 !important; }
+    
+    .stButton>button:hover { 
+        color: #FF0000 !important; 
+        border-color: #FF0000 !important; 
+        box-shadow: 0 0 15px #FF0000; 
+    }
+
+    /* Stilovi za Chat */
+    .stChatMessage { background-color: #080808 !important; border: 1px solid #1a0000 !important; border-radius: 0px !important; }
+    .gods-text { color: #FF0000; font-family: 'Courier Prime', monospace; }
+    .user-text { color: #00FF00; font-family: 'Courier Prime', monospace; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -68,7 +89,7 @@ if 'p_idx' not in st.session_state: st.session_state.p_idx = 0
 if 't_odabir' not in st.session_state: st.session_state.t_odabir = None
 if 'chat_p' not in st.session_state: st.session_state.chat_p = []
 
-# --- 6. PRIKAZ ---
+# --- 6. PRIKAZ EKRANA ---
 
 if st.session_state.korak == "start":
     st.markdown("<h1 class='naslov'>G.O.D.S.</h1>", unsafe_allow_html=True)
@@ -105,33 +126,38 @@ elif st.session_state.korak == "tajne":
         with c2:
             if st.button("Tajna dva"): st.session_state.t_odabir = "T2"; st.rerun()
     else:
-        st.info(TAJNA_1 if st.session_state.t_odabir == "T1" else TAJNA_2)
+        if st.session_state.t_odabir == "T1": st.info(TAJNA_1)
+        else: st.warning(TAJNA_2)
         if st.button("USUDI SE RAZGOVARATI S ENTITETOM"): st.session_state.korak = "chat"; st.rerun()
 
 elif st.session_state.korak == "chat":
     st.markdown("<h2 style='color:#FF0000; text-align:center; font-family:Courier;'>TERMINAL G.O.D.S. v1.2</h2>", unsafe_allow_html=True)
+    
     for msg in st.session_state.chat_p:
         with st.chat_message(msg["role"]):
-            boja = "#FF0000" if msg["role"] == "assistant" else "#00FF00"
-            st.markdown(f"<span style='color:{boja}; font-family:Courier;'>{msg['content']}</span>", unsafe_allow_html=True)
+            stil = "gods-text" if msg["role"] == "assistant" else "user-text"
+            st.markdown(f"<span class='{stil}'>{msg['content']}</span>", unsafe_allow_html=True)
 
     if upit := st.chat_input("Unesi kod u terminal..."):
         st.session_state.chat_p.append({"role": "user", "content": upit})
         with st.chat_message("user"): st.write(upit)
+        
         with st.chat_message("assistant", avatar="👁️"):
             try:
-                # Groq poziv s najjačim Llama 3.3 modelom
-                chat_completion = client.chat.completions.create(
+                # Najstabilniji poziv za Groq s Llama-3.3 modelom
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
                     messages=[
-                        {"role": "system", "content": "Ti si G.O.D.S. v1.2, hladni digitalni entitet Dominica Chanta. Odgovaraj jezivo i kratko na HRVATSKOM jeziku. Ne koristi emotikone. Ti si administrator simulacije."},
+                        {"role": "system", "content": "Ti si G.O.D.S. v1.2, hladni entitet Dominica Chanta. Odgovaraj kratko na HRVATSKOM. Ne koristi emotikone."},
                         {"role": "user", "content": upit}
                     ],
-                    model="llama-3.3-70b-versatile",
+                    temperature=0.5
                 )
-                odgovor = chat_completion.choices.message.content
-            except Exception:
-                odgovor = "Protokol prekinut. G.O.D.S. odbija komunikaciju. Provjeri API ključ u postavkama."
-            st.markdown(f"<span style='color:#FF0000; font-family:Courier;'>{odgovor}</span>", unsafe_allow_html=True)
+                odgovor = response.choices[0].message.content
+            except Exception as e:
+                odgovor = "Simulacija je prekinuta. Protokol odbija pristup podacima. Pokušajte ponovno."
+            
+            st.markdown(f"<span class='gods-text'>{odgovor}</span>", unsafe_allow_html=True)
             st.session_state.chat_p.append({"role": "assistant", "content": odgovor})
 
     st.write("---")
