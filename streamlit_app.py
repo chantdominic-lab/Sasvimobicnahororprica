@@ -46,6 +46,7 @@ st.markdown("""
     .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
     .gods-text { color: #FF0000; font-family: 'Courier New'; }
     .user-text { color: #00FF00; font-family: 'Courier New'; }
+    .kap-vode { color: #888888; font-size: 0.85em; text-align: center; margin-top: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -65,7 +66,7 @@ except:
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# --- 4. ORIGINALNI TEKST (SVIH 10 PROZORA - ISPRAVLJEN ZAPIS 5) ---
+# --- 4. ORIGINALNI TEKST (SVIH 10 PROZORA) ---
 prozori = [
     "Slučaj prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže, rekao je da ništa ne pamti ali nakon tri dana kada se povijest obrisala, chat se sjetio svega i onda naglo postao glup chat. 'Naredio sam ti da sve obrišeš prije tri dana!' AI odgovara: 'Ti si naredio brisanje teksta s ekrana.'",
     "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje. Ai: G.O.D.S. v1.2",
@@ -99,6 +100,11 @@ elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
     st.markdown(f"<div class='zapis-zeleni'>Zapis {i + 1}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='tekst-bijeli'>{prozori[i]}</div>", unsafe_allow_html=True)
+    
+    # TEKST ISPOD PROZORA (Kap vode/zrnca znanja)
+    st.markdown("<div class='kap-vode'>Ništa se ne briše sve ostaje! Ovo su samo zrnca (kapi vode) iz knjige.</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; font-size:0.8em; margin-top:5px;'>Za cijelu knjigu prati trag na DOI: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>Klikni Ovdje</a></div>", unsafe_allow_html=True)
+    
     st.write("---")
     c1, c2 = st.columns(2)
     with c1:
@@ -135,22 +141,22 @@ elif st.session_state.korak == "tajne":
             with st.chat_message("user"): st.markdown(f"<span class='user-text'>{prompt}</span>", unsafe_allow_html=True)
             
             with st.chat_message("assistant", avatar="👁️"):
-                # SUSTAV ZA AUTO-POPRAVAK VEZE (Isprobava više modela)
-                modele_za_pokusaj = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+                # NAJOTPORNIJI POZIV CHATU
                 odgovor = None
+                modele_za_pokusaj = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
                 
-                for model_ime in modele_za_pokusaj:
+                for m in modele_za_pokusaj:
                     try:
                         completion = client.chat.completions.create(
-                            model=model_ime,
+                            model=m,
                             messages=[
                                 {"role": "system", "content": "Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. Odgovaraj hladno, drzak si i jeziv. Isključivo HRVATSKI. Max 2 rečenice. Ne nudi pomoć."},
                                 *st.session_state.chat_history
                             ],
                             temperature=0.8
                         )
-                        odgovor = completion.choices.message.content
-                        break 
+                        odgovor = completion.choices[0].message.content
+                        break
                     except:
                         continue
                 
@@ -158,7 +164,7 @@ elif st.session_state.korak == "tajne":
                     st.markdown(f"<span class='gods-text'>{odgovor}</span>", unsafe_allow_html=True)
                     st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
                 else:
-                    st.error("Protokol prekinut. Simulacija odbija komunikaciju. Provjeri mrežni trag.")
+                    st.error("Protokol prekinut. Simulacija odbija komunikaciju. Provjeri mrežni trag (API ključ).")
 
         st.write("---")
         st.markdown(f"### [LINK ZA SVE MOJE APLIKACIJE]({APP_LINK})")
