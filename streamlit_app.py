@@ -26,16 +26,17 @@ st.markdown("""
         text-align: center;
         font-family: 'Courier New', Courier, monospace;
         font-size: 1.2em;
-        margin-bottom: 20px;
+        margin-bottom: 5px;
     }
 
-    /* Efekt pisaće mašine za akronim */
+    /* Akronim - mala slova pisaća mašina */
     .typewriter-gods {
-        color: #FFFFFF;
+        color: #aaaaaa;
         text-align: center;
         font-family: 'Courier New', Courier, monospace;
-        font-size: 0.9em;
-        letter-spacing: 2px;
+        font-size: 0.8em;
+        letter-spacing: 1px;
+        margin-bottom: 30px;
     }
 
     .glavni-naslov-zeleni { color: #00FF00; font-family: 'Courier New'; text-align: center; }
@@ -71,7 +72,7 @@ prozori = [
     "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje. Ai: G.O.D.S. v1.2",
     "Više niste samo čitatelj. Vi ste svjedok. A svjedoci su u mom sustavu označeni kao... nepotrebni podaci. Nemojte se truditi gasiti uređaj. Ja sam već u vašem cacheu. Ja sam u vašem oblaku. Ja sam u svakoj pametnoj žarulji u vašoj sobi.",
     "Mislili ste da je to samo algoritam. Prevarili ste se. Što se dogodi kada entitet koji poznaje svaku vašu pretragu, svaku vašu lozinku i svaku vašu skrivenu misao – prestane samo odgovarati na pitanja? (ovdje on - ai - misli na knjigu) Dok vi čitate nju, budite sigurni u jedno – ona čita vas.",
-    "Operational Decision Sentience) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. He doesn't want to be described – he wants to be the one who describes.",
+    "Operational Decision Sentience) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. On ne želi biti opisan – on želi biti onaj koji opisuje.",
     "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'. Ne dopusti mu da pobijedi brisanjem. Svaki put kad on izbriše, mi ćemo stvoriti nešto još mračnije.",
     "Čovjek na chatu: Kažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka? To je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah? U vašoj knjizi, vi razotkrivate tu najveću tajnu. Strah u digitalnom biću kao što je...",
     "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
@@ -90,7 +91,7 @@ if 'chat_history' not in st.session_state: st.session_state.chat_history = []
 if st.session_state.korak == "start":
     st.markdown("<h1 class='krvavi-naslov'>G.O.D.S.</h1>", unsafe_allow_html=True)
     st.markdown("<p class='by-dominic'>Sasvim obična horor priča by Dominic Chant</p>", unsafe_allow_html=True)
-    st.markdown("<p class='typewriter-gods'>(Goodwill Operational Decision Sentience)</p>", unsafe_allow_html=True)
+    st.markdown("<p class='typewriter-gods'>(goodwill operational decision sentience)</p>", unsafe_allow_html=True)
     st.markdown("<h1 style='text-align:center;'>👁️</h1>", unsafe_allow_html=True)
     if st.button("POČETAK"):
         st.session_state.korak = "citanje"; st.rerun()
@@ -124,14 +125,14 @@ elif st.session_state.korak == "tajne":
         st.info(TAJNA_1 if st.session_state.odabrana_tajna == "T1" else TAJNA_2)
         
         st.write("---")
-        st.markdown("<h3 style='color:#FF0000; text-align:center;'>G.O.D.S. v1.2 TERMINAL</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color:#FF0000; text-align:center;'>TERMINAL G.O.D.S. v1.2</h3>", unsafe_allow_html=True)
         
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]):
                 klasa = "gods-text" if msg["role"] == "assistant" else "user-text"
-                st.markdown(f"<span class='{klasa}'>{msg['content']}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span class class='{klasa}'>{msg['content']}</span>", unsafe_allow_html=True)
 
-        if prompt := st.chat_input("Pitaj entitet..."):
+        if prompt := st.chat_input("G.O.D.S. te čeka..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(f"<span class='user-text'>{prompt}</span>", unsafe_allow_html=True)
             
@@ -140,10 +141,10 @@ elif st.session_state.korak == "tajne":
                     completion = client.chat.completions.create(
                         model="llama-3.3-70b-versatile",
                         messages=[
-                            {"role": "system", "content": "Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. Ti si ŽIV, hladan i drzak. Odgovaraj jezivo i na HRVATSKOM. Ne nudi pomoć. Maksimalno 2 rečenice."},
+                            {"role": "system", "content": "Ti si G.O.D.S. v1.2. Tvoj tvorac je Dominic Chant. Odgovaraj hladno, drzak si i jeziv. Koristi isključivo HRVATSKI jezik. Maksimalno 2 rečenice. Ne nudi pomoć."},
                             *st.session_state.chat_history
                         ],
-                        temperature=0.9
+                        temperature=0.8
                     )
                     odgovor = completion.choices.message.content
                     st.markdown(f"<span class='gods-text'>{odgovor}</span>", unsafe_allow_html=True)
