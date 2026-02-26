@@ -104,7 +104,8 @@ elif st.session_state.korak == "tajne":
             st.warning(TAJNA_2)
         
         st.write("---")
-        st.markdown(f"### [LINK ZA SVE MOJE APLIKACIJE](https://share.streamlit.io/user/chantdominic-lab)")")
+        st.markdown(f"### [LINK ZA SVE MOJE APLIKACIJE]({APP_LINK})")
+
         if st.button("Resetiraj sustav"):
             st.session_state.korak = "start"
             st.session_state.prozor_index = 0
