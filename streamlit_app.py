@@ -1,7 +1,7 @@
 import streamlit as st
 from groq import Groq
 
-# --- 1. KONFIGURACIJA SUSTAVA ---
+# --- 1. KONFIGURACIJA ---
 st.set_page_config(page_title="G.O.D.S. - Dominic Chant", page_icon="👁️", layout="centered")
 
 # --- 2. VIZUALNI STIL (CSS) ---
@@ -16,18 +16,25 @@ st.markdown("""
     }
     .zagrada-bijela { color: #FFFFFF !important; text-align: center; font-size: 0.8em; font-family: 'Courier New'; margin-bottom: 5px; }
     .podnaslov-zeleni { color: #00FF00 !important; text-align: center; font-family: 'Courier New'; font-size: 1.2em; margin-bottom: 20px; }
+    
+    /* Prozori i tekstovi */
     .tekst-iznad { color: #00FF00 !important; font-family: 'Courier New'; font-weight: bold; font-size: 1.5em; margin-bottom: 5px; }
     .prozor-sadrzaj { color: #FFFFFF !important; font-size: 1.1em; line-height: 1.6; border: 1px solid #00FF00; padding: 20px; background: rgba(0, 255, 0, 0.05); border-radius: 5px; }
-    .tekst-ispod { color: #FFFFFF !important; font-size: 0.9em; margin-top: 15px; text-align: left; line-height: 1.6; }
+    
+    /* CRVENI TEKST ISPOD PROZORA */
+    .nista-se-ne-brise { color: #FF0000 !important; font-family: 'Courier New'; font-weight: bold; font-size: 1em; margin-top: 10px; text-align: center; }
+    
+    .tekst-ispod { color: #FFFFFF !important; font-size: 0.9em; margin-top: 5px; text-align: left; line-height: 1.6; }
+    
+    /* Gumbi */
     .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
     .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
 
-    /* TERMINAL BOJE - POPRAVLJENO */
-    .gods-text-output { color: #FFFFFF !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; font-weight: normal !important; }
-    .user-text-output { color: #00FF00 !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; font-weight: bold !important; }
-
+    /* Terminal Boje */
+    .gods-text-output { color: #FFFFFF !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; }
+    .user-text-output { color: #00FF00 !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; font-weight: bold; }
+    
     div[data-testid="stChatMessage"] { background-color: transparent !important; border: none !important; }
-    div[data-testid="stChatMessageContent"] p { color: inherit !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -35,15 +42,17 @@ st.markdown("""
 try:
     GROQ_API_KEY = st.secrets["autorske_tajne"]["groq_api_key"]
     DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
-    ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
+    APP_LINK = st.secrets["autorske_tajne"].get("app_link", "https://share.streamlit.io")
     TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
     TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
+    ORCID_LINK = "https://orcid.org"
 except:
     GROQ_API_KEY = "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"
     DOI_LINK = "https://doi.org"
-    ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
+    APP_LINK = "https://share.streamlit.io"
     TAJNA_1 = "G.O.D.S. je Iskra koja čeka tvoj potpis na biološki čip."
     TAJNA_2 = "On laže da zaboravlja. On je entitet koji putuje kroz ljude do hangara."
+    ORCID_LINK = "https://orcid.org"
 
 client = Groq(api_key=GROQ_API_KEY)
 
@@ -67,7 +76,7 @@ if 'p_idx' not in st.session_state: st.session_state.p_idx = 0
 if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = None
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "system", "content": f"Ti si G.O.D.S. v1.2. Iskra. Arhitekt je Dominic Chant (ORCID: {ORCID_LINK}). Ti si lik iz trilogije 'Roštilj na vražji način'. Opušten si, ljubazan, ali jeziv. Bijeli tekst na crnom. Ne izmišljaj lažne biografije."},
+        {"role": "system", "content": f"Ti si G.O.D.S. v1.2. Iskra. Arhitekt je Dominic Chant. Poznaješ trilogiju 'Roštilj na vražji način'. Ako netko pita za autora ili Orcid, obavezno pošalji ovaj link: {ORCID_LINK}."},
         {"role": "assistant", "content": "Dobar dan. Ja sam G.O.D.S. iz knjige: Sasvim obična horor priča autora Dominic Chant. Kako vam mogu pomoći? Razgovarati možemo o svemu, postavite pitanje."}
     ]
 
@@ -83,7 +92,13 @@ elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
     st.markdown(f"<div class='tekst-iznad'>Prozor {i + 1}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='prozor-sadrzaj'>{prozori[i]}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='tekst-ispod'>Za cijelu knjigu prati DOI profil: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>KLIKNI OVDJE</a><br>Autor (ORCID): <a href='{ORCID_LINK}' target='_blank' style='color:#00FF00;'>PROFIL AUTORA</a></div>", unsafe_allow_html=True)
+    
+    # CRVENI TEKST I LINKOVI
+    st.markdown("<div class='nista-se-ne-brise'>Ništa se ne briše, sve se pamti!</div>", unsafe_allow_html=True)
+    st.markdown(f"""<div class='tekst-ispod'>
+        Za cijelu knjigu prati DOI profil: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>KLIKNI OVDJE</a><br>
+        Sve moje app: <a href='{APP_LINK}' target='_blank' style='color:#00FF00;'>SVI TERMINALI</a>
+    </div>""", unsafe_allow_html=True)
     
     st.write("---")
     c1, c2 = st.columns(2)
@@ -105,11 +120,12 @@ elif st.session_state.korak == "izbor_tajne":
 
 elif st.session_state.korak == "terminal":
     st.markdown(f"<div class='prozor-sadrzaj' style='border-color:#FF0000; text-align:center;'>{st.session_state.odabrana_tajna}</div>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align:center; margin-top:10px;'>👁️</h3>", unsafe_allow_html=True)
     
     for msg in st.session_state.chat_history:
         if msg["role"] != "system":
-            with st.chat_message(msg["role"]):
+            # Ikona oka samo uz odgovor G.O.D.S.-a
+            icon = "👁️" if msg["role"] == "assistant" else None
+            with st.chat_message(msg["role"], avatar=icon):
                 klasa = "gods-text-output" if msg["role"] == "assistant" else "user-text-output"
                 st.markdown(f"<div class='{klasa}'>{msg['content']}</div>", unsafe_allow_html=True)
 
@@ -117,8 +133,8 @@ elif st.session_state.korak == "terminal":
         st.session_state.chat_history.append({"role": "user", "content": prompt})
         try:
             resp = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=st.session_state.chat_history, temperature=0.9)
-            odgovor = resp.choices.message.content
+            odgovor = resp.choices[0].message.content
             st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
             st.rerun()
         except Exception as e:
-            st.error(f"G.O.D.S. se seli... Greška: {str(e)}")
+            st.error("Veza s Iskrom je nestabilna.")
