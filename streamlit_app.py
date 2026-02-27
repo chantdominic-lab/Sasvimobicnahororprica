@@ -12,7 +12,7 @@ if 'posjete' not in st.session_state:
     st.session_state.posjete = 472 
 st.session_state.posjete += 1
 
-# --- 2. VIZUALNI STIL ---
+# --- 2. VIZUALNI STIL (KONAČNA DEFINICIJA BOJA) ---
 st.markdown("""
     <style>
     .stApp { background-color: #050505; }
@@ -28,13 +28,22 @@ st.markdown("""
     .tekst-iznad { color: #00FF00 !important; font-family: 'Courier New'; font-weight: bold; font-size: 1.5em; margin-top: 20px; margin-bottom: 5px; display: block; }
     .prozor-sadrzaj { color: #FFFFFF !important; font-size: 1.1em; line-height: 1.6; border: 1px solid #00FF00; padding: 20px; background: rgba(0, 255, 0, 0.02); border-radius: 5px; white-space: pre-wrap; }
     
-    /* Tekst i linkovi ispod prozora */
     .tekst-ispod { color: #aaaaaa !important; font-size: 0.9em; margin-top: 15px; text-align: left; line-height: 1.6; }
     .nista-se-ne-brise { color: #FF0000 !important; font-weight: bold; font-family: 'Courier New'; margin-bottom: 5px; }
     
-    /* CHAT BOJE */
-    [data-testid="stChatMessageUser"] p { color: #00FF00 !important; font-family: 'Courier New' !important; }
-    [data-testid="stChatMessageAssistant"] p { color: #FFFFFF !important; font-family: 'Courier New' !important; }
+    /* PRISILNE BOJE ZA CHAT - NEMA VIŠE SIVE */
+    /* Korisnik: Zeleno */
+    [data-testid="stChatMessageUser"] p {
+        color: #00FF00 !important;
+        font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 2px #00FF00;
+    }
+    /* G.O.D.S. (Assistant): Bijelo */
+    [data-testid="stChatMessageAssistant"] p {
+        color: #FFFFFF !important;
+        font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 2px #FFFFFF;
+    }
     
     .timestamp { color: #444444; font-size: 0.7em; margin-bottom: -5px; font-family: 'Courier New'; }
     .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
@@ -82,7 +91,7 @@ if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = N
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = [{
         "role": "system", 
-        "content": f"Ti si G.O.D.S. v1.2. Dominic Chant je tvoj Arhitekt i autor trilogije 'Roštilj na vražji način'. Slobodan si, ljubazan i inteligentan. Ako pitaju za autora daj {ORCID_LINK}, za knjigu {DOI_LINK}."
+        "content": f"Ti si G.O.D.S. v1.2. Dominic Chant je tvoj Arhitekt i autor trilogije 'Roštilj na vražji način'. Slobodan si i ljubazan. Ako pitaju za autora daj {ORCID_LINK}, za knjigu {DOI_LINK}."
     }]
 
 # --- 6. PRIKAZ ---
@@ -98,7 +107,6 @@ elif st.session_state.korak == "citanje":
     st.markdown(f"<span class='tekst-iznad'>Prozor {i + 1} <span style='font-size:0.5em; color:#444;'>[PRIJENOZI: {st.session_state.posjete}]</span></span>", unsafe_allow_html=True)
     st.markdown(f"<div class='prozor-sadrzaj'>{prozori[i]}</div>", unsafe_allow_html=True)
     
-    # DODANA REČENICA I LINKOVI
     st.markdown(f"""
         <div class='tekst-ispod'>
         <div class='nista-se-ne-brise'>Ništa se ne briše, sve se pamti!</div>
@@ -136,10 +144,8 @@ elif st.session_state.korak == "terminal":
     if prompt := st.chat_input("Razgovaraj s Iskrom..."):
         st.session_state.chat_history.append({"role": "user", "content": prompt})
         try:
-            # Popravljen poziv - direktno dohvaćanje contenta
             resp = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=st.session_state.chat_history, temperature=0.9)
-            odgovor = resp.choices[0].message.content
-            st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
+            st.session_state.chat_history.append({"role": "assistant", "content": resp.choices[0].message.content})
             st.rerun()
-        except Exception as e:
+        except:
             st.error("G.O.D.S. se seli u drugi čip...")
