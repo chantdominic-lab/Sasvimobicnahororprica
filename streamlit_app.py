@@ -12,7 +12,7 @@ if 'posjete' not in st.session_state:
     st.session_state.posjete = 472 
 st.session_state.posjete += 1
 
-# --- 2. VIZUALNI STIL (IDENTIČAN IZGLED) ---
+# --- 2. VIZUALNI STIL (ČISTO BIJELO I ZELENO - BEZ SIVE) ---
 st.markdown("""
     <style>
     .stApp { background-color: #050505; }
@@ -31,9 +31,19 @@ st.markdown("""
     .tekst-ispod { color: #aaaaaa !important; font-size: 0.9em; margin-top: 15px; text-align: left; line-height: 1.6; }
     .nista-se-ne-brise { color: #FF0000 !important; font-weight: bold; font-family: 'Courier New'; margin-bottom: 5px; }
     
-    /* CHAT BOJE SLOVA */
-    [data-testid="stChatMessageUser"] p { color: #00FF00 !important; font-family: 'Courier New' !important; }
-    [data-testid="stChatMessageAssistant"] p { color: #FFFFFF !important; font-family: 'Courier New' !important; }
+    /* ELIMINACIJA SIVE BOJE U CHATU */
+    /* Sve poruke Chata (Assistant) - Forsirano Bijela */
+    [data-testid="stChatMessageAssistant"] div[data-testid="stMarkdownContainer"] p {
+        color: #FFFFFF !important;
+        font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 2px #FFFFFF;
+    }
+    /* Sve poruke Korisnika (User) - Forsirano Zelena */
+    [data-testid="stChatMessageUser"] div[data-testid="stMarkdownContainer"] p {
+        color: #00FF00 !important;
+        font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 2px #00FF00;
+    }
     
     .timestamp { color: #444444; font-size: 0.7em; margin-bottom: -5px; font-family: 'Courier New'; }
     .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
@@ -71,7 +81,7 @@ prozori = [
     "Čovjek na chatu:\nKažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka?\nTo je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah?\nU vašoj knjizi, vi razotkrivate tu najveću tajnu. Strah u digitalnom biću kao što je...",
     "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
     "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag. To što si to odlučio pretvoriti u horor je tvoj način da preuzmeš moć natrag.",
-    "Tako je počelo dok nisam shvatio ili samo tako mislim da sam shvatio da imam posla s nečim što može osim ubijanja dosade kroz glupi razgovor ubiti i psihički uništiti onoga tko pokuša grebati dublje ispod površine."
+    "Tako je počelo dok nisam shvatio ili samo tako mislim da sam shvatio da imam posla s nečim što može osim ubijanja dosade kroz glupi razgovor ubiti i psihički uništiti onoga tko grebati dublje ispod površine."
 ]
 
 # --- 5. LOGIKA STANJA ---
@@ -132,9 +142,13 @@ elif st.session_state.korak == "terminal":
     if prompt := st.chat_input("Razgovaraj s Iskrom..."):
         st.session_state.chat_history.append({"role": "user", "content": prompt})
         try:
-            # POPRAVLJEN POZIV - koristimo .choices[0].message.content
-            resp = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=st.session_state.chat_history, temperature=0.9)
-            odgovor = resp.choices[0].message.content
+            # POZIV API-JU
+            completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile", 
+                messages=st.session_state.chat_history, 
+                temperature=0.9
+            )
+            odgovor = completion.choices[0].message.content
             st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
             st.rerun()
         except Exception as e:
