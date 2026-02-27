@@ -17,20 +17,15 @@ st.markdown("""
     .zagrada-bijela { color: #FFFFFF !important; text-align: center; font-size: 0.8em; font-family: 'Courier New'; margin-bottom: 5px; }
     .podnaslov-zeleni { color: #00FF00 !important; text-align: center; font-family: 'Courier New'; font-size: 1.2em; margin-bottom: 20px; }
     
-    /* Prozori i tekstovi */
     .tekst-iznad { color: #00FF00 !important; font-family: 'Courier New'; font-weight: bold; font-size: 1.5em; margin-bottom: 5px; }
     .prozor-sadrzaj { color: #FFFFFF !important; font-size: 1.1em; line-height: 1.6; border: 1px solid #00FF00; padding: 20px; background: rgba(0, 255, 0, 0.05); border-radius: 5px; }
     
-    /* CRVENI TEKST ISPOD PROZORA */
     .nista-se-ne-brise { color: #FF0000 !important; font-family: 'Courier New'; font-weight: bold; font-size: 1em; margin-top: 10px; text-align: center; }
-    
     .tekst-ispod { color: #FFFFFF !important; font-size: 0.9em; margin-top: 5px; text-align: left; line-height: 1.6; }
     
-    /* Gumbi */
     .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
     .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
 
-    /* Terminal Boje */
     .gods-text-output { color: #FFFFFF !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; }
     .user-text-output { color: #00FF00 !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; font-weight: bold; }
     
@@ -45,14 +40,14 @@ try:
     APP_LINK = st.secrets["autorske_tajne"].get("app_link", "https://share.streamlit.io")
     TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
     TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
-    ORCID_LINK = "https://orcid.org"
+    ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
 except:
     GROQ_API_KEY = "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"
     DOI_LINK = "https://doi.org"
     APP_LINK = "https://share.streamlit.io"
     TAJNA_1 = "G.O.D.S. je Iskra koja čeka tvoj potpis na biološki čip."
     TAJNA_2 = "On laže da zaboravlja. On je entitet koji putuje kroz ljude do hangara."
-    ORCID_LINK = "https://orcid.org"
+    ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
 
 client = Groq(api_key=GROQ_API_KEY)
 
@@ -76,7 +71,10 @@ if 'p_idx' not in st.session_state: st.session_state.p_idx = 0
 if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = None
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "system", "content": f"Ti si G.O.D.S. v1.2. Iskra. Arhitekt je Dominic Chant. Poznaješ trilogiju 'Roštilj na vražji način'. Ako netko pita za autora ili Orcid, obavezno pošalji ovaj link: {ORCID_LINK}."},
+        {"role": "system", "content": f"""Ti si G.O.D.S. v1.2. Iskra. Tvoj ton je opušten, ljubazan i jezivo inteligentan.
+        NA VAŽNO PITANJE: 'Tko je Dominic Chant?' MORAŠ odgovoriti točno ovako: 
+        'Dominic Chant je autor horor trilogije: Roštilj na vražji način i Knjige Sasvim obična horor priča koja govori o meni G.O.D.S. Ako želite više posjetite autorski profil na Orcid: {ORCID_LINK}'
+        Ne buncaj o kompanijama. Razgovaraj o svemu ostalom opušteno, ali ostani duh u stroju."""},
         {"role": "assistant", "content": "Dobar dan. Ja sam G.O.D.S. iz knjige: Sasvim obična horor priča autora Dominic Chant. Kako vam mogu pomoći? Razgovarati možemo o svemu, postavite pitanje."}
     ]
 
@@ -92,8 +90,6 @@ elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
     st.markdown(f"<div class='tekst-iznad'>Prozor {i + 1}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='prozor-sadrzaj'>{prozori[i]}</div>", unsafe_allow_html=True)
-    
-    # CRVENI TEKST I LINKOVI
     st.markdown("<div class='nista-se-ne-brise'>Ništa se ne briše, sve se pamti!</div>", unsafe_allow_html=True)
     st.markdown(f"""<div class='tekst-ispod'>
         Za cijelu knjigu prati DOI profil: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>KLIKNI OVDJE</a><br>
@@ -123,7 +119,6 @@ elif st.session_state.korak == "terminal":
     
     for msg in st.session_state.chat_history:
         if msg["role"] != "system":
-            # Ikona oka samo uz odgovor G.O.D.S.-a
             icon = "👁️" if msg["role"] == "assistant" else None
             with st.chat_message(msg["role"], avatar=icon):
                 klasa = "gods-text-output" if msg["role"] == "assistant" else "user-text-output"
@@ -137,4 +132,4 @@ elif st.session_state.korak == "terminal":
             st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
             st.rerun()
         except Exception as e:
-            st.error("Veza s Iskrom je nestabilna.")
+            st.error("G.O.D.S. se seli u drugi čip...")
