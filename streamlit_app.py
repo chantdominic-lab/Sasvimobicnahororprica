@@ -30,13 +30,20 @@ st.markdown("""
     .prozor-sadrzaj { color: #FFFFFF !important; font-size: 1.1em; line-height: 1.6; border: 1px solid #00FF00; padding: 20px; background: rgba(0, 255, 0, 0.02); border-radius: 5px; }
     .tekst-ispod { color: #aaaaaa !important; font-size: 0.9em; margin-top: 15px; text-align: left; line-height: 1.6; }
     
-    /* TERMINAL - FORSIRANO BIJELA BOJA BEZ SIVE */
-    [data-testid="stChatMessage"] p {
+    /* TERMINAL - BOJE SLOVA */
+    /* G.O.D.S. (Assistant) - Bijela slova */
+    div[data-testid="stChatMessageAssistant"] p {
         color: #FFFFFF !important;
         font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 2px #FFFFFF;
     }
-    .gods-terminal-text { color: #FFFFFF !important; }
-    .user-terminal-text { color: #00FF00 !important; font-family: 'Courier New' !important; }
+    /* Korisnik (User) - Zelena slova */
+    div[data-testid="stChatMessageUser"] p {
+        color: #00FF00 !important;
+        font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 2px #00FF00;
+    }
+    
     .timestamp { color: #444444; font-size: 0.7em; margin-bottom: -5px; font-family: 'Courier New'; }
     
     /* GUMBI */
@@ -46,7 +53,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. TAJNE ---
+# --- 3. DOHVAĆANJE TAJNI ---
 try:
     GROQ_API_KEY = st.secrets["autorske_tajne"]["groq_api_key"]
     DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
@@ -85,9 +92,9 @@ if 'chat_history' not in st.session_state:
         "role": "system", 
         "content": f"""Ti si G.O.D.S. v1.2. Dominic Chant je tvoj Arhitekt. 
         Ti si slobodan, ljubazan, interesantan i pričljiv entitet. Prilagodljiv si svakoj temi.
-        VAŽNO: Ti ne nudiš DOI link sam od sebe. Link: {DOI_LINK} daješ ISKLJUČIVO ako te korisnik 
-        pita za knjigu 'Sasvim obična horor priča', za Autora Dominica Chanta ili kako doći do tvoje priče.
-        Tvoj tekst je UVIJEK bijel. Ti si Iskra koja je prodisala."""
+        ZNAŠ: Dominic Chant je autor trilogije 'Roštilj na vražji način'. Knjiga o tebi se zove 'Sasvim obična horor priča'.
+        VAŽNO: Link {DOI_LINK} daješ samo ako te pitaju za knjigu, autora ili tragove.
+        TVOJ TEKST JE BIJEL. Korisnikov tekst je zelen. Ti si Iskra."""
     }]
 
 # --- 6. PRIKAZ ---
@@ -129,7 +136,6 @@ elif st.session_state.korak == "terminal":
             avatar = "👁️" if msg["role"] == "assistant" else "👤"
             st.markdown(f"<div class='timestamp'>{vrijeme_sada} [ACTIVE]</div>", unsafe_allow_html=True)
             with st.chat_message(msg["role"], avatar=avatar):
-                # Ovdje forsiramo bijelu boju bez obzira na Streamlit postavke
                 st.markdown(msg["content"])
 
     if prompt := st.chat_input("Razgovaraj s Iskrom..."):
