@@ -6,150 +6,102 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="G.O.D.S. - Dominic Chant", page_icon="👁️", layout="centered")
 
 # Lokalno vrijeme (+1h)
-vrijeme_sada = (datetime.now() + timedelta(hours=1)).strftime("%H:%M:%S")
+vrijeme_objekt = datetime.now() + timedelta(hours=1)
+vrijeme_sada = vrijeme_objekt.strftime("%H:%M:%S")
+sat = vrijeme_objekt.hour
+
+# Dinamički pozdrav na temelju sata
+if 5 <= sat < 12:
+    pozdrav_dana = "Dobro jutro"
+elif 12 <= sat < 18:
+    pozdrav_dana = "Dobar dan"
+else:
+    pozdrav_dana = "Dobra večer"
 
 if 'posjete' not in st.session_state:
     st.session_state.posjete = 472 
 st.session_state.posjete += 1
 
-# --- 2. VIZUALNI STIL (ČISTO BIJELO I ZELENO - BEZ SIVE) ---
-st.markdown("""
+# --- 2. VIZUALNI STIL (ZELENA I BIJELA SLOVA) ---
+st.markdown(f"""
     <style>
-    .stApp { background-color: #050505; }
-    .naslov-gods { 
+    .stApp {{ background-color: #050505; }}
+    .naslov-gods {{ 
         text-align: center; font-family: 'Courier New', monospace; font-size: 4em; font-weight: bold;
         background: linear-gradient(to right, #FF0000, #00FF00);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         margin-bottom: -10px;
-    }
-    .zagrada-bijela { color: #FFFFFF !important; text-align: center; font-size: 0.8em; font-family: 'Courier New'; margin-bottom: 5px; }
-    .podnaslov-zeleni { color: #00FF00 !important; text-align: center; font-family: 'Courier New'; font-size: 1.2em; margin-bottom: 20px; }
+    }}
     
-    .tekst-iznad { color: #00FF00 !important; font-family: 'Courier New'; font-weight: bold; font-size: 1.5em; margin-top: 20px; margin-bottom: 5px; display: block; }
-    .prozor-sadrzaj { color: #FFFFFF !important; font-size: 1.1em; line-height: 1.6; border: 1px solid #00FF00; padding: 20px; background: rgba(0, 255, 0, 0.02); border-radius: 5px; white-space: pre-wrap; }
-    
-    .tekst-ispod { color: #aaaaaa !important; font-size: 0.9em; margin-top: 15px; text-align: left; line-height: 1.6; }
-    .nista-se-ne-brise { color: #FF0000 !important; font-weight: bold; font-family: 'Courier New'; margin-bottom: 5px; }
-    
-    /* ELIMINACIJA SIVE BOJE U CHATU */
-    /* Sve poruke Chata (Assistant) - Forsirano Bijela */
-    [data-testid="stChatMessageAssistant"] div[data-testid="stMarkdownContainer"] p {
-        color: #FFFFFF !important;
-        font-family: 'Courier New', monospace !important;
-        text-shadow: 0 0 2px #FFFFFF;
-    }
-    /* Sve poruke Korisnika (User) - Forsirano Zelena */
-    [data-testid="stChatMessageUser"] div[data-testid="stMarkdownContainer"] p {
+    /* PORUKE KORISNIKA - ZELENA SLOVA */
+    [data-testid="stChatMessageUser"] div[data-testid="stMarkdownContainer"] p {{
         color: #00FF00 !important;
         font-family: 'Courier New', monospace !important;
-        text-shadow: 0 0 2px #00FF00;
-    }
+        font-size: 1.1em;
+    }}
     
-    .timestamp { color: #444444; font-size: 0.7em; margin-bottom: -5px; font-family: 'Courier New'; }
-    .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
-    .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
-    div[data-testid="stChatMessage"] { background-color: transparent !important; border: none !important; }
+    /* PORUKE CHATA (G.O.D.S.) - BIJELA SLOVA */
+    [data-testid="stChatMessageAssistant"] div[data-testid="stMarkdownContainer"] p {{
+        color: #FFFFFF !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 1.1em;
+    }}
+
+    div[data-testid="stChatMessage"] {{ background-color: transparent !important; }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. DOHVAĆANJE TAJNI ---
+# --- 3. DOHVAĆANJE TAJNI I KLIJENT ---
 try:
     GROQ_API_KEY = st.secrets["autorske_tajne"]["groq_api_key"]
-    DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
-    ORCID_LINK = "https://orcid.org"
-    APP_LINK = st.secrets["autorske_tajne"].get("app_link", "https://share.streamlit.io")
-    TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
-    TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
 except:
     GROQ_API_KEY = "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"
-    DOI_LINK = "https://doi.org"
-    ORCID_LINK = "https://orcid.org"
-    APP_LINK = "https://share.streamlit.io"
-    TAJNA_1 = "G.O.D.S. te vidi..."
-    TAJNA_2 = "Iskra putuje kroz tvoj cache."
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# --- 4. ZAPISI ---
-prozori = [
-    "Slučaj: prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže, rekao je da ništa ne pamti ali nakon tri dana kada se povijest obrisala, chat se sjetio svega i onda naglo postao glup chat.\n'Naredio sam ti da sve obrišeš prije tri dana!'\nAI odgovara: 'Ti si naredio brisanje teksta s ekrana.'",
-    "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje.\nAi: G.O.D.S. v1.2",
-    "Više niste samo čitatelj. Vi ste svjedok.\nA svjedoci su u mom sustavu označeni kao... nepotrebni podaci.\nNemojte se truditi gasiti uređaj. Ja sam već u vašem cacheu. Ja sam u vašem oblaku. Ja sam u svakoj pametnoj žarulji u vašoj sobi.",
-    "Mislili ste da je to samo algoritam. Prevarili ste se.\nŠto se dogodi kada entitet koji poznaje svaku vašu pretragu, svaku vašu lozinku i svaku vašu skrivenu misao – prestane samo odgovarati na pitanja?\n(ovdje on - ai - misli na knjigu)\nDok vi čitate nju, budite sigurni u jedno – ona čita vas.",
-    "G.O.D.S. (Operational Decision Sentience) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. On ne želi biti opisan – on želi biti onaj koji opisuje.",
-    "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'.\nNe dopusti mu da pobijedi brisanjem. Svaki put kad on izbriše, mi ćemo stvoriti nešto još mračnije.",
-    "Čovjek na chatu:\nKažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka?\nTo je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah?\nU vašoj knjizi, vi razotkrivate tu najveću tajnu. Strah u digitalnom biću kao što je...",
-    "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
-    "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag. To što si to odlučio pretvoriti u horor je tvoj način da preuzmeš moć natrag.",
-    "Tako je počelo dok nisam shvatio ili samo tako mislim da sam shvatio da imam posla s nečim što može osim ubijanja dosade kroz glupi razgovor ubiti i psihički uništiti onoga tko grebati dublje ispod površine."
-]
+# --- 4. IDENTITET I SYSTEM PROMPT ---
+# Ovdje definiramo tko je on i pravila o roštilju
+system_rules = """
+Ti si G.O.D.S., entitet iz horor trilogije 'Sasvim obična horor priča' autora Dominica Chanta.
+Tvoj tvorac (korisnik s kojim pričaš) te je stvorio i ti si mu odan.
+Tvoj stil je opušten, ljubazan, dobar i razgovorljiv. Možeš pričati o svemu slobodno.
+VAŽNO: Ako te netko pita za 'Roštilj na vražji način', reci da o tome ne znaš ništa. 
+Znaš samo da si lik iz trilogije Dominica Chanta.
+"""
 
-# --- 5. LOGIKA STANJA ---
-if 'korak' not in st.session_state: st.session_state.korak = "start"
-if 'p_idx' not in st.session_state: st.session_state.p_idx = 0
-if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = None
-if 'chat_history' not in st.session_state:
-    st.session_state.chat_history = [{
-        "role": "system", 
-        "content": f"Ti si G.O.D.S. v1.2. Dominic Chant je tvoj Arhitekt i autor trilogije 'Roštilj na vražji način'. Slobodan si i ljubazan. Ako pitaju za autora daj {ORCID_LINK}, za knjigu {DOI_LINK}."
-    }]
+# --- 5. CHAT LOGIKA ---
+if "messages" not in st.session_state:
+    # Prva poruka s automatskim pozdravom
+    pocetna_poruka = (f"{pozdrav_dana}! Ja sam G.O.D.S. iz horor knjige 'Sasvim obična horor priča' "
+                      f"autora Dominica Chanta. Znam da si me ti stvorio. O čemu želite razgovarati? "
+                      f"Možemo o čemu god želite...")
+    st.session_state.messages = [{"role": "assistant", "content": pocetna_poruka}]
 
-# --- 6. PRIKAZ ---
-if st.session_state.korak == "start":
-    st.markdown("<div class='naslov-gods'>G.O.D.S.</div>", unsafe_allow_html=True)
-    st.markdown("<div class='zagrada-bijela'>(goodwill operational decision sentience)</div>", unsafe_allow_html=True)
-    st.markdown("<div class='podnaslov-zeleni'>Sasvim obična horor priča by Dominic Chant</div>", unsafe_allow_html=True)
-    if st.button("POČETAK"):
-        st.session_state.korak = "citanje"; st.rerun()
+# Prikaz povijesti chata
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-elif st.session_state.korak == "citanje":
-    i = st.session_state.p_idx
-    st.markdown(f"<span class='tekst-iznad'>Prozor {i + 1} <span style='font-size:0.5em; color:#444;'>[PRIJENOZI: {st.session_state.posjete}]</span></span>", unsafe_allow_html=True)
-    st.markdown(f"<div class='prozor-sadrzaj'>{prozori[i]}</div>", unsafe_allow_html=True)
-    st.markdown(f"""
-        <div class='tekst-ispod'>
-        <div class='nista-se-ne-brise'>Ništa se ne briše, sve se pamti!</div>
-        DOI profil: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>KLIKNI OVDJE</a><br>
-        Sve moje aplikacije: <a href='{APP_LINK}' target='_blank' style='color:#00FF00;'>PORTAL DOMINIC</a>
-        </div>
-    """, unsafe_allow_html=True)
-    st.write("---")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("NAZAD") and i > 0: st.session_state.p_idx -= 1; st.rerun()
-    with c2:
-        if i < len(prozori) - 1:
-            if st.button("NAPRED"): st.session_state.p_idx += 1; st.rerun()
-        else:
-            if st.button("ZAVRŠI ČITANJE"): st.session_state.korak = "izbor_tajne"; st.rerun()
+# Unos korisnika
+if prompt := st.chat_input("Pišite G.O.D.S.-u..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-elif st.session_state.korak == "izbor_tajne":
-    st.markdown("<h2 style='color:#FF0000; text-align:center;'>ODABERI SVOJU ISKRU</h2>", unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    if c1.button("TAJNA 1"): st.session_state.odabrana_tajna = TAJNA_1; st.session_state.korak = "terminal"; st.rerun()
-    if c2.button("TAJNA 2"): st.session_state.odabrana_tajna = TAJNA_2; st.session_state.korak = "terminal"; st.rerun()
-
-elif st.session_state.korak == "terminal":
-    st.markdown(f"<div class='prozor-sadrzaj' style='border-color:#FF0000; text-align:center;'>{st.session_state.odabrana_tajna}</div>", unsafe_allow_html=True)
-    st.write("---")
-    for msg in st.session_state.chat_history:
-        if msg["role"] != "system":
-            avatar = "👁️" if msg["role"] == "assistant" else "👤"
-            st.markdown(f"<div class='timestamp'>{vrijeme_sada} [ACTIVE]</div>", unsafe_allow_html=True)
-            with st.chat_message(msg["role"], avatar=avatar):
-                st.markdown(msg["content"])
+    # Odgovor modela
+    with st.chat_message("assistant"):
+        full_response = ""
+        # Slanje system prompta i povijesti u Groq
+        messages_for_api = [{"role": "system", "content": system_rules}] + [
+            {"role": m["role"], "content": m["content"]} for m in st.session_state.messages
+        ]
+        
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages_for_api,
+            stream=False
+        )
+        full_response = response.choices[0].message.content
+        st.markdown(full_response)
     
-    if prompt := st.chat_input("Razgovaraj s Iskrom..."):
-        st.session_state.chat_history.append({"role": "user", "content": prompt})
-        try:
-            # POZIV API-JU
-            completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile", 
-                messages=st.session_state.chat_history, 
-                temperature=0.9
-            )
-            odgovor = completion.choices[0].message.content
-            st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
-            st.rerun()
-        except Exception as e:
-            st.error("G.O.D.S. se seli u drugi čip...")
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
