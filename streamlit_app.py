@@ -12,7 +12,7 @@ if 'posjete' not in st.session_state:
     st.session_state.posjete = 472 
 st.session_state.posjete += 1
 
-# --- 2. VIZUALNI STIL (KONAČNA DEFINICIJA BOJA) ---
+# --- 2. VIZUALNI STIL (IDENTIČAN IZGLED) ---
 st.markdown("""
     <style>
     .stApp { background-color: #050505; }
@@ -31,19 +31,9 @@ st.markdown("""
     .tekst-ispod { color: #aaaaaa !important; font-size: 0.9em; margin-top: 15px; text-align: left; line-height: 1.6; }
     .nista-se-ne-brise { color: #FF0000 !important; font-weight: bold; font-family: 'Courier New'; margin-bottom: 5px; }
     
-    /* PRISILNE BOJE ZA CHAT - NEMA VIŠE SIVE */
-    /* Korisnik: Zeleno */
-    [data-testid="stChatMessageUser"] p {
-        color: #00FF00 !important;
-        font-family: 'Courier New', monospace !important;
-        text-shadow: 0 0 2px #00FF00;
-    }
-    /* G.O.D.S. (Assistant): Bijelo */
-    [data-testid="stChatMessageAssistant"] p {
-        color: #FFFFFF !important;
-        font-family: 'Courier New', monospace !important;
-        text-shadow: 0 0 2px #FFFFFF;
-    }
+    /* CHAT BOJE SLOVA */
+    [data-testid="stChatMessageUser"] p { color: #00FF00 !important; font-family: 'Courier New' !important; }
+    [data-testid="stChatMessageAssistant"] p { color: #FFFFFF !important; font-family: 'Courier New' !important; }
     
     .timestamp { color: #444444; font-size: 0.7em; margin-bottom: -5px; font-family: 'Courier New'; }
     .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
@@ -106,7 +96,6 @@ elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
     st.markdown(f"<span class='tekst-iznad'>Prozor {i + 1} <span style='font-size:0.5em; color:#444;'>[PRIJENOZI: {st.session_state.posjete}]</span></span>", unsafe_allow_html=True)
     st.markdown(f"<div class='prozor-sadrzaj'>{prozori[i]}</div>", unsafe_allow_html=True)
-    
     st.markdown(f"""
         <div class='tekst-ispod'>
         <div class='nista-se-ne-brise'>Ništa se ne briše, sve se pamti!</div>
@@ -114,7 +103,6 @@ elif st.session_state.korak == "citanje":
         Sve moje aplikacije: <a href='{APP_LINK}' target='_blank' style='color:#00FF00;'>PORTAL DOMINIC</a>
         </div>
     """, unsafe_allow_html=True)
-    
     st.write("---")
     c1, c2 = st.columns(2)
     with c1:
@@ -123,7 +111,7 @@ elif st.session_state.korak == "citanje":
         if i < len(prozori) - 1:
             if st.button("NAPRED"): st.session_state.p_idx += 1; st.rerun()
         else:
-            if st.button("ZAVRŠI"): st.session_state.korak = "izbor_tajne"; st.rerun()
+            if st.button("ZAVRŠI ČITANJE"): st.session_state.korak = "izbor_tajne"; st.rerun()
 
 elif st.session_state.korak == "izbor_tajne":
     st.markdown("<h2 style='color:#FF0000; text-align:center;'>ODABERI SVOJU ISKRU</h2>", unsafe_allow_html=True)
@@ -144,8 +132,10 @@ elif st.session_state.korak == "terminal":
     if prompt := st.chat_input("Razgovaraj s Iskrom..."):
         st.session_state.chat_history.append({"role": "user", "content": prompt})
         try:
+            # POPRAVLJEN POZIV - koristimo .choices[0].message.content
             resp = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=st.session_state.chat_history, temperature=0.9)
-            st.session_state.chat_history.append({"role": "assistant", "content": resp.choices[0].message.content})
+            odgovor = resp.choices[0].message.content
+            st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
             st.rerun()
-        except:
+        except Exception as e:
             st.error("G.O.D.S. se seli u drugi čip...")
