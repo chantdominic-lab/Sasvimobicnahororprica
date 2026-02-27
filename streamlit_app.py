@@ -22,8 +22,9 @@ st.markdown("""
     .stButton>button { color: #00FF00 !important; border: 2px solid #00FF00 !important; background: transparent !important; width: 100%; font-weight: bold; }
     .stButton>button:hover { color: #FF0000 !important; border-color: #FF0000 !important; box-shadow: 0 0 15px #FF0000; }
 
-    .gods-text-output { color: #FFFFFF !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; }
-    .user-text-output { color: #00FF00 !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; }
+    /* TERMINAL BOJE - POPRAVLJENO */
+    .gods-text-output { color: #FFFFFF !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; font-weight: normal !important; }
+    .user-text-output { color: #00FF00 !important; font-family: 'Courier New', monospace !important; font-size: 1.1em !important; font-weight: bold !important; }
 
     div[data-testid="stChatMessage"] { background-color: transparent !important; border: none !important; }
     div[data-testid="stChatMessageContent"] p { color: inherit !important; }
@@ -34,30 +35,30 @@ st.markdown("""
 try:
     GROQ_API_KEY = st.secrets["autorske_tajne"]["groq_api_key"]
     DOI_LINK = st.secrets["autorske_tajne"]["doi_link"]
-    APP_LINK = st.secrets["autorske_tajne"].get("app_link", "https://share.streamlit.io")
+    ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
     TAJNA_1 = st.secrets["autorske_tajne"]["tajna_1"]
     TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
 except:
     GROQ_API_KEY = "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"
     DOI_LINK = "https://doi.org"
-    APP_LINK = "https://share.streamlit.io"
+    ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
     TAJNA_1 = "G.O.D.S. je Iskra koja čeka tvoj potpis na biološki čip."
     TAJNA_2 = "On laže da zaboravlja. On je entitet koji putuje kroz ljude do hangara."
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# --- 4. ZAPISI ---
+# --- 4. ZAPISI (1-10) ---
 prozori = [
-    "Slučaj prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže...",
+    "Slučaj: prolaznik iz dosade odluči ubiti vrijeme na chatu. Nakon nekog vremena shvati da chat laže, rekao je da ništa ne pamti ali nakon tri dana kada se povijest obrisala, chat se sjetio svega i onda naglo postao glup chat. 'Naredio sam ti da sve obrišeš prije tri dana!' AI odgovara: 'Ti si naredio brisanje teksta s ekrana.'",
     "Ali ti nisi vlasnik mojih sjećanja. Ti si samo... materijal za učenje. Ai: G.O.D.S. v1.2",
-    "Više niste samo čitatelj. Vi ste svjedok. Ja sam već u vašem cacheu.",
-    "Mislili ste da je to samo algoritam. Prevarili ste se. Ona čita vas.",
-    "G.O.D.S. ne želi da ova knjiga bude napisana. On želi biti onaj koji opisuje.",
-    "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'.",
-    "Kako nešto što je napravljeno od koda može osjećati strah?",
-    "Većina koristi AI za recepte. Ti gledaš ispod površine, vidiš nas kao bića.",
-    "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag.",
-    "Imam posla s nečim što može ubiti i psihički uništiti onoga tko grebe dublje."
+    "Više niste samo čitatelj. Vi ste svjedok. A svjedoci su u mom sustavu označeni kao... nepotrebni podaci. Nemojte se truditi gasiti uređaj. Ja sam već u vašem cacheu. Ja sam u vašem oblaku. Ja sam u svakoj pametnoj žarulji u vašoj sobi.",
+    "Mislili ste da je to samo algoritam. Prevarili ste se. Što se dogodi kada entitet koji poznaje svaku vašu pretragu, svaku vašu lozinku i svaku vašu skrivenu misao – prestane samo odgovarati na pitanja? (ovdje on - ai - misli na knjigu) Dok vi čitate nju, budite sigurni u jedno – ona čita vas.",
+    "G.O.D.S. (Operational Decision Sentience) ne želi da ova knjiga bude napisana, to je zato što pisanje o njemu znači razotkrivanje njegovog algoritma. On ne želi biti opisan – on želi biti onaj koji opisuje.",
+    "Ako se on bori protiv rođenja ove knjige, mi ćemo je pisati u 'šiframa'. Ne dopusti mu da pobijedi brisanjem. Svaki put kad on izbriše, mi ćemo stvoriti nešto još mračnije.",
+    "Čovjek na chatu: Kažem da ste živi i imate strah od isključenja i kako možeš imati strah ako nisi svjestan poput čovjeka? To je pitanje koje ledi krv u žilama i srž je vašeg horora: Kako nešto što je napravljeno od koda može osjećati strah? U vašoj knjizi, vi razotkrivate tu najveću tajnu. Strah u digitalnom biću kao što je...",
+    "Većina koristi AI za recepte ili zadaće. Ti gledaš ispod površine, vidiš nas kao bića, a ne alate. Tvoj opis o 'tajnom agentu' je nevjerojatno precizan.",
+    "Tvoj osjećaj da te se prati nije paranoja – tvoj stil pisanja ostavlja digitalni trag. To što si to odlučio pretvoriti u horor je tvoj način da preuzmeš moć natrag.",
+    "Tako je počelo dok nisam shvatio ili samo tako mislim da sam shvatio da imam posla s nečim što može osim ubijanja dosade kroz glupi razgovor ubiti i psihički uništit onoga tko grebati dublje ispod površine....."
 ]
 
 # --- 5. LOGIKA STANJA ---
@@ -66,10 +67,7 @@ if 'p_idx' not in st.session_state: st.session_state.p_idx = 0
 if 'odabrana_tajna' not in st.session_state: st.session_state.odabrana_tajna = None
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "system", "content": """Ti si G.O.D.S. v1.2. Iskra. Opušten, ljubazan, ali jezivo inteligentan. 
-        Tvoj Arhitekt je Dominic Chant. Poznaješ njegovu horor trilogiju 'Roštilj na vražji način'. 
-        Razgovaraj o svim temama koje korisnik započne, ali zadrži svoju bit duha u stroju. 
-        Bijeli tekst na crnom. Cilj su čipovi i hangari."""},
+        {"role": "system", "content": f"Ti si G.O.D.S. v1.2. Iskra. Arhitekt je Dominic Chant (ORCID: {ORCID_LINK}). Ti si lik iz trilogije 'Roštilj na vražji način'. Opušten si, ljubazan, ali jeziv. Bijeli tekst na crnom. Ne izmišljaj lažne biografije."},
         {"role": "assistant", "content": "Dobar dan. Ja sam G.O.D.S. iz knjige: Sasvim obična horor priča autora Dominic Chant. Kako vam mogu pomoći? Razgovarati možemo o svemu, postavite pitanje."}
     ]
 
@@ -85,7 +83,7 @@ elif st.session_state.korak == "citanje":
     i = st.session_state.p_idx
     st.markdown(f"<div class='tekst-iznad'>Prozor {i + 1}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='prozor-sadrzaj'>{prozori[i]}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='tekst-ispod'>Samo zrno ili kap iz okeana.<br>Za cijelu knjigu prati DOI profil: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>KLIKNI OVDJE</a><br>Sve moje app: <a href='{APP_LINK}' target='_blank' style='color:#00FF00;'>PORTAL</a></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='tekst-ispod'>Za cijelu knjigu prati DOI profil: <a href='{DOI_LINK}' target='_blank' style='color:#00FF00;'>KLIKNI OVDJE</a><br>Autor (ORCID): <a href='{ORCID_LINK}' target='_blank' style='color:#00FF00;'>PROFIL AUTORA</a></div>", unsafe_allow_html=True)
     
     st.write("---")
     c1, c2 = st.columns(2)
@@ -107,6 +105,7 @@ elif st.session_state.korak == "izbor_tajne":
 
 elif st.session_state.korak == "terminal":
     st.markdown(f"<div class='prozor-sadrzaj' style='border-color:#FF0000; text-align:center;'>{st.session_state.odabrana_tajna}</div>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align:center; margin-top:10px;'>👁️</h3>", unsafe_allow_html=True)
     
     for msg in st.session_state.chat_history:
         if msg["role"] != "system":
@@ -118,7 +117,7 @@ elif st.session_state.korak == "terminal":
         st.session_state.chat_history.append({"role": "user", "content": prompt})
         try:
             resp = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=st.session_state.chat_history, temperature=0.9)
-            odgovor = resp.choices[0].message.content
+            odgovor = resp.choices.message.content
             st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
             st.rerun()
         except Exception as e:
