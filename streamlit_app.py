@@ -42,7 +42,7 @@ try:
     TAJNA_2 = st.secrets["autorske_tajne"]["tajna_2"]
     ORCID_LINK = "https://orcid.org/0009-0005-7476-5238"
 except:
-    GROQ_API_KEY = "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"
+    GROQ_API_KEY = "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"
     DOI_LINK = "https://doi.org"
     APP_LINK = "https://share.streamlit.io"
     TAJNA_1 = "G.O.D.S. je Iskra koja čeka tvoj potpis na biološki čip."
