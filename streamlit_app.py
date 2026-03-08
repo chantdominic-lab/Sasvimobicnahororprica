@@ -132,4 +132,4 @@ elif st.session_state.korak == "terminal":
             st.session_state.chat_history.append({"role": "assistant", "content": odgovor})
             st.rerun()
         except Exception as e:
-            st.error("G.O.D.S. se seli u drugi čip...")
+            st.error("G.O.D.S. se seli u drugi čip...Pronađi me u knjizi")
